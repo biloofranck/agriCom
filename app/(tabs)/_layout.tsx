@@ -22,7 +22,7 @@ export default function Layout() {
         return (
           <View className="absolute  bottom-0 left-0 right-0 items-center justify-around  overflow-visible">
             {/* Curve SVG background */}
-            <View className="w-full h-20 ">
+            <View className="w-full h-24 ">
               <Svg width="100%" height="100%" viewBox="0 10 90 80" preserveAspectRatio="none">
                 <Path
                   d="M0,0 L0,100 L100,100 L100,0 C66,0 60,50 50,50 C40,50 34,0 0,0 Z"
@@ -34,7 +34,7 @@ export default function Layout() {
             </View>
 
             {/* Tab bar icons */}
-            <View className="absolute bottom-[-12]  w-full flex-row justify-around items-center    h-16 rounded-t-3xl shadow-lg">
+            <View className="absolute bottom-[-12]  w-full flex-row justify-around items-center    h-24 rounded-t-3xl shadow-lg">
               {state.routes.map((route, index) => {
                 const isFocused = state.index === index;
 
@@ -56,7 +56,7 @@ export default function Layout() {
                     <TouchableOpacity
                       key={route.key}
                       onPress={onPress}
-                      className="absolute -top-12 w-16 h-16 bg-[#34D399] rounded-full items-center justify-center shadow-md"
+                      className="absolute -top-8 w-16 h-16 bg-[#34D399] rounded-full items-center justify-center shadow-md"
                     >
                       <Ionicons name="add" size={30} color="white" className='font-bold'/>
                     </TouchableOpacity>
