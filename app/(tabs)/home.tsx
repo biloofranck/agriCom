@@ -1,6 +1,6 @@
 import { View, Text, Image, FlatList } from 'react-native';
 import posts from '../../assets/posts.json';
-import { Feather, FontAwesome } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import React from 'react';
 
 const imageMap: Record<string, any> = {
@@ -30,7 +30,7 @@ const storyData = [
 
 const Home = () => {
   const renderPost = ({ item }: any) => (
-    <View className="bg-white rounded-xl p-4 mb-1">
+    <View className="rounded-xl p-4 mb-1">
       {/* Header */}
       <View className="flex-row items-center mb-1">
         <Image
@@ -60,14 +60,14 @@ const Home = () => {
 
       {/* Footer (Likes/Comments) */}
       <View className="flex-row justify-between mt-3 px-1">
-        <Text className="text-emerald-500">💚 {(item.likes / 1000).toFixed(1)}K</Text>
+        <Text className="text-[#34D399]">💚 {(item.likes / 1000).toFixed(1)}K</Text>
         <Text className="text-gray-600">💬 {item.comments}</Text>
       </View>
     </View>
   );
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 ">
       {/* Header */}
       <View className="flex-row justify-between items-center px-3 py-6 mb-3 mt-2">
         <Image
@@ -76,8 +76,8 @@ const Home = () => {
           resizeMode="cover"
         />
         <View className="flex-row items-center gap-4 px-3">
-          <Feather name="message-square" size={16} color="white" className="bg-tertiary p-1 rounded-lg" />
-          <Feather name="bell" size={16} color="white" className="bg-tertiary p-1 rounded-lg" />
+          <Ionicons name="chatbox" size={26} color="#34D399"  />
+          <Ionicons name="notifications" size={26} color="#34D399" />
         </View>
       </View>
 
@@ -93,7 +93,7 @@ const Home = () => {
             if (item.type === 'add') {
               return (
                 <View className="items-center mr-4">
-                  <View className="bg-white border-2 border-emerald-500 h-20 w-20 rounded-full items-center justify-center">
+                  <View className=" border-2 border-[#34D399] h-20 w-20 rounded-full items-center justify-center">
                     <Feather name="plus" size={28} color="#22c55e" />
                   </View>
                   <Text className="text-xs mt-1 text-gray-600 w-20 text-center" numberOfLines={1}>
@@ -105,7 +105,7 @@ const Home = () => {
 
             return (
               <View className="items-center mr-4">
-                <View className="bg-white border-2 border-emerald-500 h-20 w-20 rounded-full  overflow-hidden">
+                <View className="border-2 border-[#34D399] h-20 w-20 rounded-full  overflow-hidden">
                   <Image
                     source={item.image}
                     className="h-full w-full rounded-full"

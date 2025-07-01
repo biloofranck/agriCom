@@ -1,50 +1,79 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-// No NativeWind imports if you want to completely avoid it for styling components
+import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
-export default function AddListingScreen() {
-  const [title, setTitle] = useState('Sell chair');
-  const [description, setDescription] = useState('I will do your floor');
-  const [listingType, setListingType] = useState('Goods'); // 'Goods' or 'Services'
-  const [price, setPrice] = useState(100);
+export default function AddScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+
+  // Initialize state from params (if coming back from addScreen2 or summary)
+  const [title, setTitle] = useState(params.title ?? 'Cassava');
+  const [quantity, setQuantity] = useState(params.quantity ?? "12Kilo" );
+
+  const [description, setDescription] = useState(params.description ?? 'I am selling cassava');
+  const [listingType, setListingType] = useState(params.listingType ?? 'Goods'); // 'Goods' or 'Services'
+  const [price, setPrice] = useState(Number(params.price) || 1250);
+
+  const handleNext = () => {
+    router.push({
+      pathname: '/screens/addScreen2',
+      params: {
+        title,
+        description,
+        listingType,
+        quantity,
+        price: price.toString(),
+        selectedImages: params.selectedImages || JSON.stringify([]),
+      },
+    });
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.scrollView}>
+    <SafeAreaView className="flex-1 mt-8 bg-white">
+      <ScrollView className="flex-1 px-4">
         {/* Header */}
-        <View style={styles.headerContainer}>
-          <TouchableOpacity style={styles.backButton}>
-            {/* Custom Back Arrow (simple 'V' shape) */}
-            <View style={styles.backArrow} />
+        <View className="flex-row items-center justify-between py-4">
+          <TouchableOpacity onPress={() => router.back()} className="p-2">
+            <View className="w-3 h-3 border-b-2 border-l-2 border-black rotate-45" />
           </TouchableOpacity>
-          <Text style={styles.addListingText}>Add Listing</Text>
-          <View style={styles.headerPlaceholder} />
+          <Text className="text-xl font-semibold">Add Listing</Text>
+          <View className="w-8" />
         </View>
 
         {/* Progress Indicator */}
-        <View style={styles.progressContainer}>
-          <Text style={styles.stepText}>Step 1/3 General Information</Text>
-          <View style={styles.progressBarBackground}>
-            <View style={styles.progressBarFill} />
+        <View className="mb-6">
+          <Text className="text-sm text-gray-600 mb-2">Step 1/3 General Information</Text>
+          <View className="flex-row h-2 rounded-full bg-gray-200">
+            <View className="w-1/3 bg-[#34D399] rounded-full" />
           </View>
         </View>
 
         {/* Title Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Title</Text>
+        <View className="mb-4">
+          <Text className="text-base font-medium mb-2">Title</Text>
           <TextInput
-            style={styles.textInput}
+            className="border border-gray-300 rounded-lg p-3 text-base"
             placeholder="Title"
             value={title}
             onChangeText={setTitle}
           />
         </View>
 
-        {/* Description Input */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Description</Text>
+         <View className="mb-4">
+          <Text className="text-base font-medium mb-2">Quantity</Text>
           <TextInput
-            style={[styles.textInput, styles.descriptionInput]}
+            className="border border-gray-300 rounded-lg p-3 text-base"
+            placeholder="quantity"
+            value={quantity}
+            onChangeText={setQuantity}
+          />
+        </View>
+
+        {/* Description Input */}
+        <View className="mb-4">
+          <Text className="text-base font-medium mb-2">Description</Text>
+          <TextInput
+            className="border border-gray-300 rounded-lg p-3 text-base h-24"
             placeholder="Description"
             multiline
             textAlignVertical="top"
@@ -54,262 +83,78 @@ export default function AddListingScreen() {
         </View>
 
         {/* Listing Type Radio Buttons */}
-        <View style={styles.radioGroup}>
-          <Text style={styles.radioLabel}>Listing Type</Text>
+        <View className="mb-6">
+          <Text className="text-base font-medium mb-3">Listing Type</Text>
           <TouchableOpacity
-            style={styles.radioButton}
+            className="flex-row items-center mb-2"
             onPress={() => setListingType('Goods')}
           >
             <View
-              style={[
-                styles.radioOuterCircle,
-                listingType === 'Goods' ? styles.radioOuterCircleActive : styles.radioOuterCircleInactive,
-              ]}
+              className={`w-5 h-5 rounded-full border-2 mr-2 flex items-center justify-center ${
+                listingType === 'Goods' ? 'border-[#34D399] bg-[#34D399]' : 'border-gray-400'
+              }`}
             >
-              {listingType === 'Goods' && <View style={styles.radioInnerCircle} />}
+              {listingType === 'Goods' && <View className="w-2.5 h-2.5 rounded-full bg-white" />}
             </View>
-            <Text style={styles.radioOptionText}>Goods</Text>
+            <Text className="text-base">Goods</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.radioButton}
+            className="flex-row items-center"
             onPress={() => setListingType('Services')}
           >
             <View
-              style={[
-                styles.radioOuterCircle,
-                listingType === 'Services' ? styles.radioOuterCircleActive : styles.radioOuterCircleInactive,
-              ]}
+              className={`w-5 h-5 rounded-full border-2 mr-2 flex items-center justify-center ${
+                listingType === 'Services' ? 'border-[#34D399] bg-[#34D399]' : 'border-gray-400'
+              }`}
             >
-              {listingType === 'Services' && <View style={styles.radioInnerCircle} />}
+              {listingType === 'Services' && <View className="w-2.5 h-2.5 rounded-full bg-white" />}
             </View>
-            <Text style={styles.radioOptionText}>Services</Text>
+            <Text className="text-base">Services</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Price "Slider" (Simulated with basic components) */}
-        <View style={styles.priceSliderContainer}>
-          <View style={styles.priceSliderHeader}>
-            <Text style={styles.inputLabel}>Price</Text>
-            <Text style={styles.priceValueText}>${price}/h</Text>
+        {/* Price Control */}
+        <View className="mb-10">
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-base font-medium">Price</Text>
+            <Text className="text-lg font-bold text-[#34D399]">FCFA {price}</Text>
           </View>
-          {/* Visual representation of slider track */}
-          <View style={styles.sliderTrack}>
+          <View className="relative h-2 rounded-full bg-gray-300">
             <View
-              style={[
-                styles.sliderFill,
-                { width: `${(price / 500) * 100}%` }, // Max price assumed to be 500
-              ]}
+              className="absolute h-2 rounded-full bg-[#34D399]"
+              style={{ width: `${(price / 10000) * 100}%` }}
             />
-            {/* Slider Thumb (purely visual here) */}
             <View
-              style={[
-                styles.sliderThumb,
-                { left: `${(price / 500) * 100}%` }, // Adjust thumb position
-              ]}
+              className="absolute -top-1 w-4 h-4 rounded-full bg-[#34D399]"
+              style={{ left: `${(price / 10000) * 100}%`, transform: [{ translateX: -8 }] }}
             />
           </View>
-          {/* Controls to adjust price */}
-          <View style={styles.priceControls}>
-            <TouchableOpacity onPress={() => setPrice(Math.max(0, price - 10))}>
-              <Text style={styles.priceControlBtn}>-</Text>
+          <View className="flex-row justify-between items-center mt-4">
+            <TouchableOpacity className="px-3 py-2" onPress={() => setPrice(Math.max(0, price - 50))}>
+              <Text className="text-lg font-bold text-[#34D399]">-</Text>
             </TouchableOpacity>
             <TextInput
-              style={styles.priceInput}
+              className="border border-gray-300 rounded-lg p-2 text-center w-24"
               keyboardType="numeric"
               value={String(price)}
-              onChangeText={(text) => setPrice(parseInt(text) || 0)}
+              onChangeText={(text) => setPrice(parseInt(text, 10) || 0)}
             />
-            <TouchableOpacity onPress={() => setPrice(Math.min(500, price + 10))}>
-              <Text style={styles.priceControlBtn}>+</Text>
+            <TouchableOpacity className="px-3 py-2" onPress={() => setPrice(Math.min(10000, price + 50))}>
+              <Text className="text-lg font-bold text-[#34D399]">+</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Next Step Button */}
-        <TouchableOpacity style={styles.nextStepButton}>
-          <Text style={styles.nextStepButtonText}>Next Step</Text>
+        <TouchableOpacity
+          className="bg-[#34D399] py-4 rounded-full mb-8"
+          onPress={handleNext}
+          disabled={!title || !quantity ||!description || !listingType || price <= 0}
+        >
+          <Text className="text-white text-center text-lg font-semibold">Next Step</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 16, // px-4 in Tailwind
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16, // py-4 in Tailwind
-  },
-  backButton: {
-    padding: 8, // p-2 in Tailwind
-  },
-  backArrow: {
-    width: 12, // w-3 in Tailwind
-    height: 12, // h-3 in Tailwind
-    borderBottomWidth: 2,
-    borderLeftWidth: 2,
-    borderColor: 'black',
-    transform: [{ rotate: '-45deg' }],
-  },
-  addListingText: {
-    fontSize: 20, // text-xl in Tailwind
-    fontWeight: '600', // font-semibold in Tailwind
-  },
-  headerPlaceholder: {
-    width: 32, // w-8 in Tailwind
-  },
-  progressContainer: {
-    marginBottom: 24, // mb-6 in Tailwind
-  },
-  stepText: {
-    color: '#6B7280', // gray-600 in Tailwind
-    fontSize: 14, // text-sm in Tailwind
-    marginBottom: 8, // mb-2 in Tailwind
-  },
-  progressBarBackground: {
-    flexDirection: 'row',
-    height: 8, // h-2 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-    backgroundColor: '#E5E7EB', // gray-200 in Tailwind
-  },
-  progressBarFill: {
-    width: '33.333%', // w-1/3 in Tailwind
-    backgroundColor: '#2DD4BF', // teal-500 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-  },
-  inputContainer: {
-    marginBottom: 16, // mb-4 in Tailwind
-  },
-  inputLabel: {
-    fontSize: 16, // text-base in Tailwind
-    fontWeight: '500', // font-medium in Tailwind
-    marginBottom: 8, // mb-2 in Tailwind
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB', // gray-300 in Tailwind
-    borderRadius: 8, // rounded-lg in Tailwind
-    padding: 12, // p-3 in Tailwind
-    fontSize: 16, // text-base in Tailwind
-  },
-  descriptionInput: {
-    height: 96, // h-24 in Tailwind
-  },
-  radioGroup: {
-    marginBottom: 24, // mb-6 in Tailwind
-  },
-  radioLabel: {
-    fontSize: 16, // text-base in Tailwind
-    fontWeight: '500', // font-medium in Tailwind
-    marginBottom: 12, // mb-3 in Tailwind
-  },
-  radioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8, // mb-2 in Tailwind
-  },
-  radioOuterCircle: {
-    width: 20, // w-5 in Tailwind
-    height: 20, // h-5 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-    borderWidth: 2,
-    marginRight: 8, // mr-2 in Tailwind
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioOuterCircleActive: {
-    borderColor: '#2DD4BF', // teal-500 in Tailwind
-    backgroundColor: '#2DD4BF', // teal-500 in Tailwind
-  },
-  radioOuterCircleInactive: {
-    borderColor: '#9CA3AF', // gray-400 in Tailwind
-  },
-  radioInnerCircle: {
-    width: 10, // w-2.5 in Tailwind
-    height: 10, // h-2.5 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-    backgroundColor: 'white',
-  },
-  radioOptionText: {
-    fontSize: 16, // text-base in Tailwind
-  },
-  priceSliderContainer: {
-    marginBottom: 40, // mb-10 in Tailwind
-  },
-  priceSliderHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8, // mb-2 in Tailwind
-  },
-  priceValueText: {
-    fontSize: 18, // text-lg in Tailwind
-    fontWeight: '700', // font-bold in Tailwind
-    color: '#0D9488', // teal-600 in Tailwind
-  },
-  sliderTrack: {
-    height: 8, // h-2 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-    backgroundColor: '#D1D5DB', // gray-300 in Tailwind
-    position: 'relative',
-  },
-  sliderFill: {
-    position: 'absolute',
-    height: 8, // h-2 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-    backgroundColor: '#2DD4BF', // teal-500 in Tailwind
-    left: 0,
-  },
-  sliderThumb: {
-    position: 'absolute',
-    top: -4, // Adjust to center vertically on track
-    width: 16, // w-4 in Tailwind
-    height: 16, // h-4 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-    backgroundColor: '#2DD4BF', // teal-500 in Tailwind
-    // We adjust 'left' in the component's render based on price for precise positioning
-    marginLeft: -8, // Half of thumb width to center it
-  },
-  priceControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16, // mt-4 in Tailwind
-    alignItems: 'center',
-  },
-  priceControlBtn: {
-    color: '#0D9488', // teal-600 in Tailwind
-    fontSize: 18, // text-lg in Tailwind
-    paddingHorizontal: 12, // Some padding for touchable area
-    paddingVertical: 8,
-  },
-  priceInput: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB', // gray-300 in Tailwind
-    borderRadius: 8, // rounded-lg in Tailwind
-    padding: 8, // p-2 in Tailwind
-    textAlign: 'center',
-    width: 96, // w-24 in Tailwind
-  },
-  nextStepButton: {
-    backgroundColor: '#2DD4BF', // teal-500 in Tailwind
-    paddingVertical: 16, // py-4 in Tailwind
-    borderRadius: 9999, // rounded-full in Tailwind
-    marginBottom: 32, // mb-8 in Tailwind
-  },
-  nextStepButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontSize: 18, // text-lg in Tailwind
-    fontWeight: '600', // font-semibold in Tailwind
-  },
-});

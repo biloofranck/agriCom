@@ -11,7 +11,6 @@ import {
 }
  from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import profileImage from "../../assets/images/profile1.jpg"; // Renamed for clarity
 import Kitchen from "../../assets/images/kitchen1.jpg"; // Renamed for clarity
 import Kitchen1 from "../../assets/images/kitchen4.jpg"; // Renamed for clarity
 
@@ -83,7 +82,7 @@ export default function ShopScreen() {
 
           {/* Chat icon */}
           <TouchableOpacity className="absolute bottom-3 right-3 p-1 bg-emerald-100 rounded-full">
-            <Ionicons name="chatbubble-ellipses-outline" size={18} color="#059669" />
+            <Ionicons name="chatbubble-ellipses-outline" size={18} color="#34D399" />
           </TouchableOpacity>
 
           {/* Favorite icon */}
@@ -96,17 +95,17 @@ export default function ShopScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 mt-8 ">
       <View className="flex-1 px-4 pt-4">
         {/* Location & Notification */}
         <View className="flex-row justify-between items-center mb-5">
           <View className="flex-row items-center">
             <Ionicons name="location-sharp" size={20} color="#10B981" />
-            <Text className="ml-1 text-base font-semibold text-gray-800">Los Angeles</Text>
+            <Text className="ml-1 text-base font-semibold text-gray-800">Douala Littoral</Text>
             <Ionicons name="chevron-down" size={16} color="gray" className="ml-1" />
           </View>
           <TouchableOpacity className="p-2 rounded-full bg-gray-100">
-            <Ionicons name="notifications-outline" size={24} color="gray" />
+            <Ionicons name="notifications-outline" size={24} color="#34D399" />
           </TouchableOpacity>
         </View>
 
@@ -133,14 +132,14 @@ export default function ShopScreen() {
 
         {/* Search */}
         <View className="flex-row items-center bg-gray-100 rounded-xl px-4 py-3 mb-5 shadow-sm">
-          <Ionicons name="search-outline" size={20} color="gray" />
+          <Ionicons name="search-outline" size={20} color="#34D399" />
           <TextInput
             placeholder="Search product or service..."
             className="flex-1 ml-3 text-base text-gray-700"
             placeholderTextColor="gray"
           />
           <TouchableOpacity>
-            <Ionicons name="options-outline" size={24} color="gray" />
+            <Ionicons name="options-outline" size={24} color="#34D399" />
           </TouchableOpacity>
         </View>
 

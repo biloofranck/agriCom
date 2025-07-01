@@ -34,7 +34,7 @@ export default function Layout() {
             </View>
 
             {/* Tab bar icons */}
-            <View className="absolute bottom-[-12]  w-full flex-row justify-around items-center    h-24 rounded-t-3xl shadow-lg">
+            <View className="absolute bottom-[12] w-full flex-row justify-around items-center    h-22 rounded-t-3xl shadow-lg">
               {state.routes.map((route, index) => {
                 const isFocused = state.index === index;
 
@@ -56,7 +56,7 @@ export default function Layout() {
                     <TouchableOpacity
                       key={route.key}
                       onPress={onPress}
-                      className="absolute -top-8 w-16 h-16 bg-[#34D399] rounded-full items-center justify-center shadow-md"
+                      className="absolute -top-16 w-16 h-16 bg-[#34D399] rounded-full items-center justify-center shadow-md"
                     >
                       <Ionicons name="add" size={30} color="white" className='font-bold'/>
                     </TouchableOpacity>
