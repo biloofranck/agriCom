@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system'; // Import FileSystem
+import * as FileSystem from 'expo-file-system';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+
+interface Prediction {
+  status: string;
+  confidence: number;
+}
 
 export default function AddListingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
   const title = Array.isArray(params.title) ? params.title[0] : params.title || '';
-  const quantity = Array.isArray(params.quantity)
-    ? params.quantity[0]
-    : params.quantity || "";
+  const quantity = Array.isArray(params.quantity) ? params.quantity[0] : params.quantity || '';
   const description = Array.isArray(params.description) ? params.description[0] : params.description || '';
   const listingType = Array.isArray(params.listingType) ? params.listingType[0] : params.listingType || '';
   const price = Array.isArray(params.price) ? params.price[0] : params.price || '';
@@ -31,68 +34,119 @@ export default function AddListingScreen() {
     }
   });
 
-  // Function to move image to a permanent directory
+  const [predictions, setPredictions] = useState<Record<string, Prediction>>(() => {
+    try {
+      const raw = Array.isArray(params.predictions) ? params.predictions[0] : params.predictions;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+      return {};
+    } catch (e) {
+      console.warn('Error parsing predictions:', e);
+      return {};
+    }
+  });
+
+  const uploadImageForPrediction = async (uri: string) => {
+    const apiUrl = 'http://172.20.10.3:8000/predict';
+    const fileName = uri.split('/').pop() || `image_${Date.now()}.jpg`;
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri,
+      name: fileName,
+      type: 'image/jpeg',
+    } as any);
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return await response.json(); // { product, status, confidence }
+  };
+
   const saveImagePermanently = async (uri: string) => {
-    // Define the directory for your app's images
     const appImagesDirectory = `${FileSystem.documentDirectory}app_images/`;
 
-    // Ensure the directory exists
     const directoryInfo = await FileSystem.getInfoAsync(appImagesDirectory);
     if (!directoryInfo.exists) {
       await FileSystem.makeDirectoryAsync(appImagesDirectory, { intermediates: true });
     }
 
-    // Generate a unique file name
-    const fileName = uri.split('/').pop(); // Get original file name
-    const newUri = `${appImagesDirectory}${Date.now()}_${fileName}`; // Add timestamp for uniqueness
+    const fileName = uri.split('/').pop();
+    const newUri = `${appImagesDirectory}${Date.now()}_${fileName}`;
 
     try {
-      await FileSystem.copyAsync({
-        from: uri,
-        to: newUri,
-      });
-      return newUri; // Return the new permanent URI
+      await FileSystem.copyAsync({ from: uri, to: newUri });
+      return newUri;
     } catch (error) {
-      console.error('Error saving image permanently:', error);
-      Alert.alert('Error', 'Failed to save image. Please try again.');
-      return uri; // Fallback to original URI if save fails, though it might not display
+      console.error('Error saving image:', error);
+      Alert.alert('Error', 'Failed to save image.');
+      return uri;
     }
   };
 
-
-  // Pick image handler
   const pickImage = async () => {
     if (selectedImages.length >= 4) {
-      Alert.alert('Image Limit Exceeded', 'You can only add up to 4 images.');
+      Alert.alert('Image Limit', 'You can only add up to 4 images.');
       return;
     }
 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Required', 'Please grant media library permissions to upload images.');
+      Alert.alert('Permission Needed', 'Grant media access to upload.');
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'Images', // <== Updated here
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
+    if (!result.canceled && result.assets?.length) {
       const tempUri = result.assets[0].uri;
-      const permanentUri = await saveImagePermanently(tempUri); // Save the image
+      const permanentUri = await saveImagePermanently(tempUri);
       if (permanentUri) {
-        setSelectedImages([...selectedImages, permanentUri]);
+        setSelectedImages((prev) => [...prev, permanentUri]);
+
+        try {
+          const prediction = await uploadImageForPrediction(permanentUri);
+          setPredictions((prev) => ({
+            ...prev,
+            [permanentUri]: {
+              status: prediction.status,
+              confidence: prediction.confidence,
+            },
+          }));
+
+          Alert.alert(
+            '🧠 Prediction Result',
+            `📦 Product: ${prediction.product}\n` +
+              `✅ Status: ${prediction.status}\n` +
+              `📈 Confidence: ${(prediction.confidence * 100).toFixed(2)}%`
+          );
+        } catch (error: any) {
+          Alert.alert('❌ Prediction Failed', error.message || 'An error occurred');
+        }
       }
     }
   };
 
   const removeImage = (uriToRemove: string) => {
-    // Optionally, you can also delete the file from FileSystem when removed from the list
-    // FileSystem.deleteAsync(uriToRemove, { idempotent: true }).catch(e => console.log("Failed to delete file:", e));
-    setSelectedImages(selectedImages.filter(uri => uri !== uriToRemove));
+    setSelectedImages((prev) => prev.filter((uri) => uri !== uriToRemove));
+    setPredictions((prev) => {
+      const updated = { ...prev };
+      delete updated[uriToRemove];
+      return updated;
+    });
   };
 
   const ImageSlot = ({
@@ -105,15 +159,29 @@ export default function AddListingScreen() {
     onRemove?: (uri: string) => void;
   }) => {
     if (imageUri) {
+      const prediction = predictions[imageUri];
+      const statusColor =
+        prediction?.status?.toLowerCase() === 'fresh' ? 'bg-green-500' : 'bg-red-500';
+
       return (
         <View className="relative w-[48%] h-36 rounded-lg overflow-hidden mb-4">
           <Image source={{ uri: imageUri }} className="w-full h-full" />
           <TouchableOpacity
             onPress={() => onRemove?.(imageUri)}
-            className="absolute top-2 right-2 p-1 bg-gray-700/50 rounded-full"
+            className="absolute top-2 right-2 p-1 bg-gray-700/50 rounded-full z-10"
           >
             <Text className="text-white text-xs font-bold">X</Text>
           </TouchableOpacity>
+
+          {prediction && (
+            <View
+              className={`absolute bottom-2 left-2 px-2 py-1 rounded-md ${statusColor} bg-opacity-80`}
+            >
+              <Text className="text-white text-xs font-semibold">
+                {prediction.status} ({(prediction.confidence * 100).toFixed(0)}%)
+              </Text>
+            </View>
+          )}
         </View>
       );
     } else {
@@ -131,7 +199,7 @@ export default function AddListingScreen() {
 
   const goBack = () => {
     router.push({
-      pathname: '/add', // Assuming '/add' is your first screen for general info
+      pathname: '/add',
       params: {
         title,
         quantity,
@@ -139,6 +207,7 @@ export default function AddListingScreen() {
         listingType,
         price,
         selectedImages: JSON.stringify(selectedImages),
+        predictions: JSON.stringify(predictions), // Pass predictions back
       },
     });
   };
@@ -153,12 +222,13 @@ export default function AddListingScreen() {
         listingType,
         price,
         selectedImages: JSON.stringify(selectedImages),
+        predictions: JSON.stringify(predictions), // Pass predictions forward
       },
     });
   };
 
   return (
-    <View className="flex-1  p-6">
+    <View className="flex-1 p-6">
       <StatusBar style="dark" />
 
       {/* Header */}
@@ -198,7 +268,9 @@ export default function AddListingScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          className={`flex-1 ml-2 p-3 rounded-full ${selectedImages.length === 0 ? 'bg-gray-300' : 'bg-[#34D399]'} items-center`}
+          className={`flex-1 ml-2 p-3 rounded-full ${
+            selectedImages.length === 0 ? 'bg-gray-300' : 'bg-[#34D399]'
+          } items-center`}
           onPress={goNext}
           disabled={selectedImages.length === 0}
         >

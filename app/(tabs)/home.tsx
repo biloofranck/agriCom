@@ -8,23 +8,23 @@ const imageMap: Record<string, any> = {
   'profile2.jpg': require('../../assets/images/profile2.jpg'),
   'profile3.jpeg': require('../../assets/images/profile3.jpeg'),
   'profile4.jpeg': require('../../assets/images/profile4.jpeg'),
-  'kitchen1.jpg': require('../../assets/images/kitchen1.jpg'),
-  'kitchen2.jpg': require('../../assets/images/kitchen2.jpeg'),
-  'kitchen3.jpg': require('../../assets/images/kitchen3.jpg'),
-  'kitchen4.jpg': require('../../assets/images/kitchen4.jpg'),
+  'kitchen1.jpg': require('../../assets/images/tomatoes1.jpg'),
+  'kitchen2.jpg': require('../../assets/images/tomatoes2.jpg'),
+  'kitchen3.jpg': require('../../assets/images/banana3.jpg'),
+  'kitchen4.jpg': require('../../assets/images/banane.jpg'),
 };
 
 const getImage = (filename: string) =>
-  imageMap[filename] ?? require('../../assets/images/placeholder.png');
+  imageMap[filename] ?? require('../../assets/images/banane.jpg');
 
 const storyData = [
   { id: 'add', type: 'add', name: 'Add Story' },
   { id: '1', image: require('../../assets/images/profile1.jpg'), name: 'Cheneh Paul' },
   { id: '2', image: require('../../assets/images/profile2.jpg'), name: 'Anna Asol' },
   { id: '3', image: require('../../assets/images/profile3.jpeg'), name: 'Branly B' },
-  { id: '4', image: require('../../assets/images/profile4.jpeg'), name: 'Anne G' },
-  { id: '5', image: require('../../assets/images/profile4.jpeg'), name: 'Anne G' },
-  { id: '6', image: require('../../assets/images/profile4.jpeg'), name: 'Anne G' },
+  { id: '4', image: require('../../assets/images/profile1.jpg'), name: 'Anne G' },
+  { id: '5', image: require('../../assets/images/profile2.jpg'), name: 'Anne G' },
+  { id: '6', image: require('../../assets/images/profile3.jpeg'), name: 'Anne G' },
   { id: '7', image: require('../../assets/images/profile4.jpeg'), name: 'Anne G' },
 ];
 

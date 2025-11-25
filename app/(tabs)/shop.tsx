@@ -11,8 +11,8 @@ import {
 }
  from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Kitchen from "../../assets/images/kitchen1.jpg"; // Renamed for clarity
-import Kitchen1 from "../../assets/images/kitchen4.jpg"; // Renamed for clarity
+import Kitchen from "../../assets/images/banana3.jpg"; // Renamed for clarity
+import Kitchen1 from "../../assets/images/tomatoes2.jpg"; // Renamed for clarity
 
 
 
@@ -21,40 +21,40 @@ const products = [
   {
     id: 'p1',
     name: 'Modern Round Coffee Table',
-    price: '$129.99',
+    price: 'FCFA 129.99',
     image:
       Kitchen
   },
   {
     id: 'p2',
     name: 'Cozy Living Room Sofa',
-    price: '$599.00',
+    price: 'FCFA 599.00',
     image:Kitchen1  },
   {
     id: 'p3',
     name: 'Elegant Beige Sectional',
-    price: '$849.00',
+    price: 'FCFA 849.00',
     image:
      Kitchen1
   },
   {
     id: 'p4',
     name: 'Minimalist Wooden Desk',
-    price: '$249.99',
+    price: 'FCFA 249.99',
     image:
       Kitchen
   },
   {
     id: 'p5',
     name: 'Luxury Velvet Armchair',
-    price: '$399.00',
+    price: 'FCFA 399.00',
     // Correct way to assign a local image import directly
     image:Kitchen1,
   },
   {
     id: 'p6',
     name: 'Stylish Home Office Setup',
-    price: '$729.00',
+    price: ' FCFA 729.00',
     // Correct way to assign a local image import directly
     image: Kitchen1
   },

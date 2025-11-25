@@ -1,6 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import {useRouter} from "expo-router"
 import React from "react";
+import Home from "./(tabs)/home";
 export default function Index() {
   const navigate = useRouter()
   return (

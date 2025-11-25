@@ -7,10 +7,10 @@ export default function AddScreen() {
   const params = useLocalSearchParams();
 
   // Initialize state from params (if coming back from addScreen2 or summary)
-  const [title, setTitle] = useState(params.title ?? 'Cassava');
-  const [quantity, setQuantity] = useState(params.quantity ?? "12Kilo" );
+  const [title, setTitle] = useState(params.title ?? '');
+  const [quantity, setQuantity] = useState(params.quantity ?? "" );
 
-  const [description, setDescription] = useState(params.description ?? 'I am selling cassava');
+  const [description, setDescription] = useState(params.description ?? '');
   const [listingType, setListingType] = useState(params.listingType ?? 'Goods'); // 'Goods' or 'Services'
   const [price, setPrice] = useState(Number(params.price) || 1250);
 
@@ -29,7 +29,7 @@ export default function AddScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 mt-8 bg-white">
+    <SafeAreaView className="flex-1 mt-8">
       <ScrollView className="flex-1 px-4">
         {/* Header */}
         <View className="flex-row items-center justify-between py-4">

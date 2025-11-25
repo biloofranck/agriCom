@@ -7,8 +7,8 @@ import * as ImagePicker from 'expo-image-picker';
 // Make sure these paths correctly point to your images in the assets folder
 const defaultBackground = require('../../assets/images/kitchen3.jpg');
 const defaultProfilePic = require('../../assets/images/profile1.jpg');
-const defaultKitchen1 = require('../../assets/images/kitchen1.jpg');
-const defaultKitchen2 = require('../../assets/images/kitchen2.jpeg');
+const defaultKitchen1 = require('../../assets/images/banana3.jpg');
+const defaultKitchen2 = require('../../assets/images/tomatoes1.jpg');
 
 // Get screen height for more adaptive layout if needed, though Tailwind mostly handles it
 const { height: screenHeight } = Dimensions.get('window');
