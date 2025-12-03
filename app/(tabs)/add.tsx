@@ -2,17 +2,21 @@ import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
+// Helper to normalize query params to a single string
+const toStringParam = (v: string | string[] | undefined): string | undefined =>
+  Array.isArray(v) ? v[0] : v;
+
 export default function AddScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
   // Initialize state from params (if coming back from addScreen2 or summary)
-  const [title, setTitle] = useState(params.title ?? '');
-  const [quantity, setQuantity] = useState(params.quantity ?? "" );
+  const [title, setTitle] = useState(toStringParam(params.title) ?? '');
+  const [quantity, setQuantity] = useState(toStringParam(params.quantity) ?? "" );
 
-  const [description, setDescription] = useState(params.description ?? '');
-  const [listingType, setListingType] = useState(params.listingType ?? 'Goods'); // 'Goods' or 'Services'
-  const [price, setPrice] = useState(Number(params.price) || 1250);
+  const [description, setDescription] = useState(toStringParam(params.description) ?? '');
+  const [listingType, setListingType] = useState(toStringParam(params.listingType) ?? 'Goods'); // 'Goods' or 'Services'
+  const [price, setPrice] = useState(Number(toStringParam(params.price)) || 1250);
 
   const handleNext = () => {
     router.push({
@@ -23,7 +27,9 @@ export default function AddScreen() {
         listingType,
         quantity,
         price: price.toString(),
-        selectedImages: params.selectedImages || JSON.stringify([]),
+        selectedImages: typeof params.selectedImages === 'string'
+          ? params.selectedImages
+          : JSON.stringify(params.selectedImages ?? []),
       },
     });
   };

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, Alert } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import * as FileSystem from "expo-file-system";
+import * as ImagePicker from "expo-image-picker";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
 interface Prediction {
   status: string;
@@ -14,53 +14,69 @@ export default function AddListingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  const title = Array.isArray(params.title) ? params.title[0] : params.title || '';
-  const quantity = Array.isArray(params.quantity) ? params.quantity[0] : params.quantity || '';
-  const description = Array.isArray(params.description) ? params.description[0] : params.description || '';
-  const listingType = Array.isArray(params.listingType) ? params.listingType[0] : params.listingType || '';
-  const price = Array.isArray(params.price) ? params.price[0] : params.price || '';
+  const title = Array.isArray(params.title)
+    ? params.title[0]
+    : params.title || "";
+  const quantity = Array.isArray(params.quantity)
+    ? params.quantity[0]
+    : params.quantity || "";
+  const description = Array.isArray(params.description)
+    ? params.description[0]
+    : params.description || "";
+  const listingType = Array.isArray(params.listingType)
+    ? params.listingType[0]
+    : params.listingType || "";
+  const price = Array.isArray(params.price)
+    ? params.price[0]
+    : params.price || "";
 
   const [selectedImages, setSelectedImages] = useState<string[]>(() => {
     try {
-      const raw = Array.isArray(params.selectedImages) ? params.selectedImages[0] : params.selectedImages;
+      const raw = Array.isArray(params.selectedImages)
+        ? params.selectedImages[0]
+        : params.selectedImages;
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) return parsed;
       }
       return [];
     } catch (e) {
-      console.warn('Error parsing selectedImages:', e);
+      console.warn("Error parsing selectedImages:", e);
       return [];
     }
   });
 
-  const [predictions, setPredictions] = useState<Record<string, Prediction>>(() => {
-    try {
-      const raw = Array.isArray(params.predictions) ? params.predictions[0] : params.predictions;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') return parsed;
+  const [predictions, setPredictions] = useState<Record<string, Prediction>>(
+    () => {
+      try {
+        const raw = Array.isArray(params.predictions)
+          ? params.predictions[0]
+          : params.predictions;
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") return parsed;
+        }
+        return {};
+      } catch (e) {
+        console.warn("Error parsing predictions:", e);
+        return {};
       }
-      return {};
-    } catch (e) {
-      console.warn('Error parsing predictions:', e);
-      return {};
     }
-  });
+  );
 
   const uploadImageForPrediction = async (uri: string) => {
-    const apiUrl = 'http://172.20.10.3:8000/predict';
-    const fileName = uri.split('/').pop() || `image_${Date.now()}.jpg`;
+    const apiUrl = "http://192.168.1.150:8001/predict";
+    const fileName = uri.split("/").pop() || `image_${Date.now()}.jpg`;
 
     const formData = new FormData();
-    formData.append('file', {
+    formData.append("file", {
       uri,
       name: fileName,
-      type: 'image/jpeg',
+      type: "image/jpeg",
     } as any);
 
     const response = await fetch(apiUrl, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
 
@@ -76,36 +92,38 @@ export default function AddListingScreen() {
 
     const directoryInfo = await FileSystem.getInfoAsync(appImagesDirectory);
     if (!directoryInfo.exists) {
-      await FileSystem.makeDirectoryAsync(appImagesDirectory, { intermediates: true });
+      await FileSystem.makeDirectoryAsync(appImagesDirectory, {
+        intermediates: true,
+      });
     }
 
-    const fileName = uri.split('/').pop();
+    const fileName = uri.split("/").pop();
     const newUri = `${appImagesDirectory}${Date.now()}_${fileName}`;
 
     try {
       await FileSystem.copyAsync({ from: uri, to: newUri });
       return newUri;
     } catch (error) {
-      console.error('Error saving image:', error);
-      Alert.alert('Error', 'Failed to save image.');
+      console.error("Error saving image:", error);
+      Alert.alert("Error", "Failed to save image.");
       return uri;
     }
   };
 
   const pickImage = async () => {
     if (selectedImages.length >= 4) {
-      Alert.alert('Image Limit', 'You can only add up to 4 images.');
+      Alert.alert("Image Limit", "You can only add up to 4 images.");
       return;
     }
 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Needed', 'Grant media access to upload.');
+    if (status !== "granted") {
+      Alert.alert("Permission Needed", "Grant media access to upload.");
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'Images', // <== Updated here
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -128,13 +146,16 @@ export default function AddListingScreen() {
           }));
 
           Alert.alert(
-            '🧠 Prediction Result',
+            "🧠 Prediction Result",
             `📦 Product: ${prediction.product}\n` +
               `✅ Status: ${prediction.status}\n` +
               `📈 Confidence: ${(prediction.confidence * 100).toFixed(2)}%`
           );
         } catch (error: any) {
-          Alert.alert('❌ Prediction Failed', error.message || 'An error occurred');
+          Alert.alert(
+            "❌ Prediction Failed",
+            error.message || "An error occurred"
+          );
         }
       }
     }
@@ -161,7 +182,9 @@ export default function AddListingScreen() {
     if (imageUri) {
       const prediction = predictions[imageUri];
       const statusColor =
-        prediction?.status?.toLowerCase() === 'fresh' ? 'bg-green-500' : 'bg-red-500';
+        prediction?.status?.toLowerCase() === "fresh"
+          ? "bg-green-500"
+          : "bg-red-500";
 
       return (
         <View className="relative w-[48%] h-36 rounded-lg overflow-hidden mb-4">
@@ -178,7 +201,8 @@ export default function AddListingScreen() {
               className={`absolute bottom-2 left-2 px-2 py-1 rounded-md ${statusColor} bg-opacity-80`}
             >
               <Text className="text-white text-xs font-semibold">
-                {prediction.status} ({(prediction.confidence * 100).toFixed(0)}%)
+                {prediction.status} ({(prediction.confidence * 100).toFixed(0)}
+                %)
               </Text>
             </View>
           )}
@@ -199,7 +223,7 @@ export default function AddListingScreen() {
 
   const goBack = () => {
     router.push({
-      pathname: '/add',
+      pathname: "/add",
       params: {
         title,
         quantity,
@@ -214,7 +238,7 @@ export default function AddListingScreen() {
 
   const goNext = () => {
     router.push({
-      pathname: '/screens/summaryScreen',
+      pathname: "/screens/summaryScreen",
       params: {
         title,
         quantity,
@@ -234,7 +258,7 @@ export default function AddListingScreen() {
       {/* Header */}
       <View className="flex-row items-center mt-8 justify-between py-4">
         <TouchableOpacity onPress={goBack}>
-          <Text className="text-2xl">{'<'}</Text>
+          <Text className="text-2xl">{"<"}</Text>
         </TouchableOpacity>
         <Text className="text-lg font-semibold">Add Products</Text>
         <View className="w-6 h-6" />
@@ -242,7 +266,9 @@ export default function AddListingScreen() {
 
       {/* Progress Indicator */}
       <View className="mb-6 mt-2">
-        <Text className="text-gray-500 text-sm mb-2">Step 2/3 Add Photo & Videos</Text>
+        <Text className="text-gray-500 text-sm mb-2">
+          Step 2/3 Add Photo & Videos
+        </Text>
         <View className="h-2 bg-gray-200 rounded-full">
           <View className="w-2/3 h-full bg-[#34D399] rounded-full" />
         </View>
@@ -251,7 +277,11 @@ export default function AddListingScreen() {
       {/* Image Grid */}
       <View className="flex-row flex-wrap justify-between">
         {selectedImages.map((uri, index) => (
-          <ImageSlot key={`${uri}-${index}`} imageUri={uri} onRemove={removeImage} />
+          <ImageSlot
+            key={`${uri}-${index}`}
+            imageUri={uri}
+            onRemove={removeImage}
+          />
         ))}
         {[...Array(4 - selectedImages.length)].map((_, index) => (
           <ImageSlot key={`empty-${index}`} onAdd={pickImage} />
@@ -269,7 +299,7 @@ export default function AddListingScreen() {
 
         <TouchableOpacity
           className={`flex-1 ml-2 p-3 rounded-full ${
-            selectedImages.length === 0 ? 'bg-gray-300' : 'bg-[#34D399]'
+            selectedImages.length === 0 ? "bg-gray-300" : "bg-[#34D399]"
           } items-center`}
           onPress={goNext}
           disabled={selectedImages.length === 0}

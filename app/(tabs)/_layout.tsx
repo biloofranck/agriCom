@@ -1,8 +1,8 @@
-import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { View, TouchableOpacity,  } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { Tabs } from 'expo-router';
 import React from 'react';
+import { TouchableOpacity, View, } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 export default function Layout() {
   return (
@@ -63,7 +63,7 @@ export default function Layout() {
                   );
                 }
 
-                let iconName;
+                let iconName: keyof typeof Ionicons.glyphMap = 'home';
                 // Determine icon based on route name and focus state
                 if (route.name === 'home') {
                   iconName = isFocused ? 'home' : 'home-outline';
